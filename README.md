@@ -13,17 +13,17 @@
 
 <div align="center">
 
-[Quick start](#quick-start) &nbsp;•&nbsp; [A look around](#a-look-around) &nbsp;•&nbsp; [leakix_scrapper.py](#leakix_scrapperpy--recon-on-a-target) &nbsp;•&nbsp; [plugin_scrapper.py](#plugin_scrapperpy--the-plugin-cookbook) &nbsp;•&nbsp; [Query syntax](#query-syntax) &nbsp;•&nbsp; [Output files](#what-lands-on-disk)
+[Quick start](#quick-start) &nbsp;•&nbsp; [A look around](#a-look-around) &nbsp;•&nbsp; [leakix_scrapper.py](#leakix_scrapperpy-recon-on-a-target) &nbsp;•&nbsp; [plugin_scrapper.py](#plugin_scrapperpy-the-plugin-cookbook) &nbsp;•&nbsp; [Query syntax](#query-syntax) &nbsp;•&nbsp; [Output files](#what-lands-on-disk)
 
 </div>
 
 ---
 
-📋 **Tables, not JSON.** Services, subdomains, leak groups, vulnerable URLs — each one a box-drawn table with severity in colour.<br>
+📋 **Tables, not JSON.** Services, subdomains, leak groups, vulnerable URLs: each one a box-drawn table with severity in colour.<br>
 🔗 **Vulnerable URLs, reconstructed.** Protocol, host, port and path stitched back together, with the resource hostname substituted when the event only carries an IP.<br>
-📖 **A local reference for all 246 plugins.** One real example each, so you know what a `DotEnvConfigPlugin` hit actually looks like before you go hunting for one.<br>
+📖 **A local reference for every plugin.** One real example each, so you know what a `DotEnvConfigPlugin` hit actually looks like before you go hunting for one.<br>
 📂 **A domain list in, a folder tree out.** `--domains targets.txt` runs the lot and files each one under `bulk_output/<domain>/`.<br>
-🐢 **Polite by construction.** A single global rate limiter — one request per 1.1s — shared by every code path. Pagination stops itself on duplicates and hard caps.<br>
+🐢 **Polite by construction.** A single global rate limiter, one request per 1.1s, shared by every code path. Pagination stops itself on duplicates and hard caps.<br>
 💾 **Every run saved twice.** The rendered report as `.txt` with ANSI stripped, the untouched response as `.raw.json`, both timestamped.
 
 <br>
@@ -33,7 +33,7 @@
 <p align="center">
   <img src="assets/screenshots/leakix_scrapper_domain_scan.png" width="820" alt="The tail of a domain scan: subdomains, leaks, vulnerable URLs and a counted summary">
 </p>
-<p align="center"><em>The tail of <code>--domain nmap.org</code>. Six subdomains, one HIGH WebDAV leak across 31 events, the exact URL to look at — and both output files named on the way out.</em></p>
+<p align="center"><em>The tail of <code>--domain nmap.org</code>. Six subdomains, one HIGH WebDAV leak across 31 events, the exact URL to look at, and both output files named on the way out.</em></p>
 
 <br>
 
@@ -47,7 +47,7 @@
 <p align="center">
   <img src="assets/screenshots/leakix_plugin_scrapper.png" alt="plugin_scrapper.py --help, and the plugins_examples directory it fills">
 </p>
-<p align="center"><em><b>246 plugins, 246 files.</b> <code>AdbPlugin</code> through <code>Wso2Plugin</code> — one real, complete example of each, on disk, greppable, no API key needed to read them again.</em></p>
+<p align="center"><em><b>One file per plugin.</b> A local, greppable copy of the catalogue.</em></p>
 
 <br>
 
@@ -63,7 +63,7 @@ python3 plugin_scrapper.py                          # build the local plugin ref
 ```
 
 Both scripts take `--api-key KEY` if you would rather not use the environment
-variable. Only `--show-plugins` works without a key — it scrapes the public
+variable. Only `--show-plugins` works without a key, since it scrapes the public
 plugin index page.
 
 > [!TIP]
@@ -72,7 +72,7 @@ plugin index page.
 
 <br>
 
-## `leakix_scrapper.py` — recon on a target
+## `leakix_scrapper.py`: recon on a target
 
 Pick exactly one mode per run.
 
@@ -80,10 +80,10 @@ Pick exactly one mode per run.
 | --- | --- |
 | `--domain DOMAIN` | The domain endpoint: services, subdomains, leak groups, summary |
 | `--host IP` | The host endpoint: the same treatment for a single address |
-| `--domains FILE` | A domain per line — queries each, one folder each under `bulk_output/` |
+| `--domains FILE` | A domain per line, queried in turn, one folder each under `bulk_output/` |
 | `--subdomains DOMAIN` | Known subdomains, newest first, with distinct-IP counts |
 | `--search QUERY` | One `l9event` per leak, paginated to exhaustion |
-| `--bulk-search QUERY` | Grouped results — one record per resource, its events folded in |
+| `--bulk-search QUERY` | Grouped results: one record per resource, its events folded in |
 | `--show-plugins` | The plugin index as a table. No API key needed |
 
 And the modifiers:
@@ -100,8 +100,8 @@ And the modifiers:
 ### What a domain run gives you
 
 Leaks first, then services, then the tables that let you scan the whole thing at
-once — **All Services**, **Subdomains**, **All Leaks**, **Vulnerable URLs** —
-and a counted **Summary**. Each leak group is a card:
+once (**All Services**, **Subdomains**, **All Leaks**, **Vulnerable URLs**), and
+a counted **Summary**. Each leak group is a card:
 
 ```
 ══════════════════════════════════════════════════════════════════════════════
@@ -139,15 +139,15 @@ bulk_output/
 ```
 
 A domain that errors prints the error in red and the run **continues** to the
-next one — a dead host in the middle of a 200-line list does not cost you the
+next one. A dead host in the middle of a 200-line list does not cost you the
 other 199.
 
 ### Pagination that knows when to stop
 
 `--search` and `--bulk-search` walk pages until the results stop being new.
 Search dedupes on `(fingerprint, ip, host, port, time)` and stops on the first
-empty page; bulk dedupes on fingerprint set — falling back to
-`(resource_id, ip, ports)` — and stops after two consecutive pages of nothing
+empty page. Bulk dedupes on fingerprint set, falling back to
+`(resource_id, ip, ports)`, and stops after two consecutive pages of nothing
 new. Safety caps of 5000 and 200 pages sit behind that in case the API keeps
 happily serving the same page forever.
 
@@ -162,11 +162,11 @@ The search summary tells you how the sausage was made:
 
 <br>
 
-## `plugin_scrapper.py` — the plugin cookbook
+## `plugin_scrapper.py`: the plugin cookbook
 
-LeakIX ships 246 detection plugins. Their names tell you roughly nothing about
-what a hit looks like. This walks the whole list, pulls one live example per
-plugin, and writes it to `plugins_examples/{PluginName}.txt`.
+LeakIX ships a few hundred detection plugins, and their names tell you roughly
+nothing about what a hit looks like. This walks the whole list, pulls one live
+example per plugin, and writes it to `plugins_examples/{PluginName}.txt`.
 
 ```bash
 python3 plugin_scrapper.py
@@ -181,9 +181,9 @@ Done. saved=244  no_results=2  skipped=0  errors=0
 Files in: plugins_examples/
 ```
 
-Each file is a flat card — IP, domain, port, reconstructed URL, geo, ASN,
+Each file is a flat card: IP, domain, port, reconstructed URL, geo, ASN,
 software and version, severity, leak type, dataset size, TLS CN and SANs, and
-the plugin's own wrapped summary:
+the plugin's own wrapped summary.
 
 ```
 Plugin: DotEnvConfigPlugin
@@ -210,8 +210,8 @@ Event Source: DotEnvConfigPlugin
 
 Runs are **resumable by default**: existing files are skipped, so a run
 interrupted at plugin 180 picks up where it left off. Plugins with no current
-results get a stub file saying so — the difference between *checked and empty*
-and *never checked* is worth keeping.
+results get a stub file saying so, because the difference between *checked and
+empty* and *never checked* is worth keeping.
 
 At one request per 1.1 seconds, a full catalogue sweep takes about five minutes.
 
@@ -224,12 +224,12 @@ site's own query language applies:
 
 ```bash
 --search '+plugin:DotEnvConfigPlugin'
---search '+country:"Romania" +severity:high'
+--search '+country:"Germany" +severity:high'
 --search 'ip:"203.0.113.0/24"' --scope service
---bulk-search '+plugin:GitConfigHttpPlugin +country:"Germany"'
+--bulk-search '+plugin:GitConfigHttpPlugin +country:"France"'
 ```
 
-Mind your shell quoting — `+` and `:` survive single quotes; unquoted they may
+Mind your shell quoting. `+` and `:` survive single quotes; unquoted they may
 not.
 
 <br>
@@ -245,14 +245,16 @@ leakix_output/                                   single-target runs
 bulk_output/<domain>/                            one folder per --domains entry
 plugins_examples/                                the plugin reference
   DotEnvConfigPlugin.txt
-  … 245 more
+  HttpNTLM.txt
+  WebDAVPlugin.txt
+  …
 ```
 
 Names are `{kind}_{slug}_{UTC timestamp}`, so nothing overwrites anything and
 runs sort chronologically. The `.txt` is exactly what you saw in the terminal
-with the colour codes removed; the `.raw.json` is NDJSON for paginated modes and
-pretty-printed JSON for the single-shot endpoints — feed it to `jq` and build
-whatever you actually need.
+with the colour codes removed. The `.raw.json` is NDJSON for paginated modes and
+pretty-printed JSON for the single-shot endpoints, so you can feed it to `jq`
+and build whatever you actually need.
 
 <br>
 
@@ -260,24 +262,25 @@ whatever you actually need.
 
 - **Rate limiting is global and unconditional.** `_rate_limit()` sits inside
   `query_api()`, so every request in every mode goes through it. There is no
-  flag to turn it off, on purpose — LeakIX allows roughly one request a second.
-  A 200-domain `--domains` run therefore takes about four minutes of waiting.
-- **Two dedupe layers.** Fetchers dedupe across pages; the renderer dedupes
+  flag to turn it off, on purpose, because LeakIX allows roughly one request a
+  second. A 200-domain `--domains` run therefore takes about four minutes of
+  waiting.
+- **Two dedupe layers.** Fetchers dedupe across pages, then the renderer dedupes
   again on `(fingerprint, host, ip, port, leak type)` before printing, which is
   why the summary reports both total and unique service counts.
 - **URL reconstruction is a guess where it has to be.** Non-HTTP protocols fall
   back to `https` on port 443 and `http` otherwise, and default ports are
   omitted from the netloc.
-- **Modes do not combine — the first match wins.** `main()` checks them in this
-  order: `--show-plugins`, `--search`, `--bulk-search`, `--subdomains`,
+- **Modes do not combine, and the first match wins.** `main()` checks them in
+  this order: `--show-plugins`, `--search`, `--bulk-search`, `--subdomains`,
   `--domains`, then `--host`/`--domain`. So `--domains` beats `--domain`, and a
   stray `--search` silently beats everything after it.
-- **`--show-plugins` scrapes HTML**, matching on Bootstrap `col-sm-3` /
+- **`--show-plugins` scrapes HTML**, matching on Bootstrap `col-sm-3` and
   `col-sm-6` row structure. If LeakIX redesigns that page, that one mode breaks
   while everything else keeps working.
 
 ---
 
 <div align="center">
-<sub>Recon against systems you are authorised to test. LeakIX indexes the public internet; that is not the same as permission.</sub>
+<sub>Recon against systems you are authorised to test. LeakIX indexes the public internet, which is not the same as permission.</sub>
 </div>
